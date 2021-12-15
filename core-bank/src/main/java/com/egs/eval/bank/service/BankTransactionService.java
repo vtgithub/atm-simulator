@@ -1,0 +1,59 @@
+package com.egs.eval.bank.service;
+
+import com.egs.eval.bank.dal.entity.Transaction;
+import com.egs.eval.bank.dal.repository.TransactionRepository;
+import com.egs.eval.bank.service.mapper.TransactionMapper;
+import com.egs.eval.bank.service.model.TransactionResult;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
+
+@Service
+@RequiredArgsConstructor
+public class BankTransactionService implements TransactionService {
+
+    private final TransactionRepository repository;
+    private final TransactionMapper mapper;
+
+    @Override
+    public List<Integer> getPredefinedValues() {
+        // TODO: 12/15/21 read from database and send them to user
+        return List.of(10000,20000,30000,50000,100000);
+    }
+
+    @Override
+    public TransactionResult withdraw(Integer value, String userId) {
+        long balance = getBalanceByCheckingWithdrawCondition(userId, value);
+        Transaction transaction = mapper.getTransaction(userId, value * -1, UUID.randomUUID().toString());
+        repository.save(transaction);
+        return mapper.getTransactionResult(transaction.getTransactionId(), balance - value);
+    }
+
+    @Override
+    public TransactionResult deposit(Integer value, String userId) {
+        long balance = getUserBalanceByNullConsideration(userId);
+        Transaction transaction = mapper.getTransaction(userId, value, UUID.randomUUID().toString());
+        repository.save(transaction);
+        return mapper.getTransactionResult(transaction.getTransactionId(), balance + value);
+    }
+
+    @Override
+    public long getUserBalance(String userId) {
+        return getUserBalanceByNullConsideration(userId);
+    }
+
+    private long getBalanceByCheckingWithdrawCondition(String userId, Integer value) {
+        long balance = getUserBalanceByNullConsideration(userId);
+        if (balance < value)
+            throw new PreconditionFailedException("your balance is not enough. balance: " + balance);
+        return balance;
+    }
+
+    private long getUserBalanceByNullConsideration(String userId) {
+        Long result = repository.sumValues(userId);
+        return Objects.isNull(result) ? 0 : result;
+    }
+}
