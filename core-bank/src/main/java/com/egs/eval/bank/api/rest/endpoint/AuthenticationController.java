@@ -1,7 +1,7 @@
 package com.egs.eval.bank.api.rest.endpoint;
 
 import com.egs.eval.bank.api.rest.AuthenticationFacade;
-import com.egs.eval.bank.api.rest.model.AuthDto;
+import com.egs.eval.bank.api.rest.model.AuthRequest;
 import com.egs.eval.bank.api.rest.model.TokenResponse;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,7 @@ public class PublicAuthenticationController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public TokenResponse authenticate(@Validated @RequestBody AuthDto authDto){
-        return authenticationFacade.authenticate(authDto);
+    public TokenResponse authenticate(@Validated @RequestBody AuthRequest authRequest){
+        return authenticationFacade.authenticate(authRequest);
     }
 }
