@@ -5,8 +5,8 @@ import com.egs.eval.bank.service.model.UserQueryModel;
 import java.util.Optional;
 
 public interface UserService {
-    Optional<String> getUserId(UserQueryModel queryModel);
 
+    Optional<String> getUserId(UserQueryModel queryModel);
     /**
      *
      * @param cardNo

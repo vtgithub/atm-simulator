@@ -19,6 +19,7 @@ public class User extends Entity {
 
     @Data
     private static class Session {
+        // TODO: 12/18/21 save token inside it and put @Cacheable on top of related service that use it
         private String token;
         private LocalDateTime createdDate;
     }

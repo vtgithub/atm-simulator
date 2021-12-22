@@ -10,14 +10,14 @@ import javax.validation.constraints.NotNull;
 
 @Data
 @ApiModel
-public class AuthDto {
-    @ApiModelProperty(example = "'1111222233334444'", required = true)
+public class AuthRequest {
+    @ApiModelProperty(example = "'1122334455667788'", required = true)
     @NotBlank(message = "cardNumber can not be blank")
     private String cardNumber;
-    @ApiModelProperty(example = "'PIN'", required = true)
+    @ApiModelProperty(example = "'FINGERPRINT'", required = true)
     @NotNull(message = "authType can not be null")
     private AuthenticationMechanism authType;
-    @ApiModelProperty(example = "'qwertyuiop'", required = true)
+    @ApiModelProperty(example = "'qwertyuiopl'", required = true)
     @NotBlank(message = "authType can not be blank")
     private String value;
 }

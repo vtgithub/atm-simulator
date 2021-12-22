@@ -13,5 +13,7 @@ import org.mapstruct.NullValueCheckStrategy;
 )
 public interface TransactionFacadeMapper {
 
-    TransactionResponse getTransactionResponseFromResult(TransactionResult transactionResult, Integer value);
+    TransactionResponse getTransactionResponseFromResultAndValue(TransactionResult transactionResult, Integer value);
+
+    TransactionResponse getTransactionResponseFromResult(TransactionResult transactionResult);
 }

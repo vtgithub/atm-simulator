@@ -6,4 +6,5 @@ import lombok.Data;
 public class TransactionResult {
     private String transactionId;
     private Long balance;
+    private Long value;
 }

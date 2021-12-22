@@ -1,12 +1,9 @@
 package com.egs.eval.bank.api.rest.config;
 
 import com.egs.eval.bank.api.rest.model.ErrorResponse;
-import com.egs.eval.bank.service.NotAuthenticatedException;
-import com.egs.eval.bank.service.NumberOfAttemptsExceededException;
-import com.egs.eval.bank.service.PreconditionFailedException;
+import com.egs.eval.bank.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -22,7 +19,7 @@ import java.util.UUID;
 @Slf4j
 @ControllerAdvice
 public class GeneralControllerAdvice {
-
+    // the same
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody
@@ -41,7 +38,7 @@ public class GeneralControllerAdvice {
         }
         return ErrorResponse.builder().errors(validationErrorSet).build();
     }
-
+// the same
     @ExceptionHandler(BindException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody
@@ -71,18 +68,10 @@ public class GeneralControllerAdvice {
     }
 
     @ExceptionHandler(NumberOfAttemptsExceededException.class)
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ResponseStatus(HttpStatus.TOO_MANY_REQUESTS)
     @ResponseBody
     public ErrorResponse numberOfAttemptsExceededExceptionHandler(NumberOfAttemptsExceededException e) {
         log.warn("numberOfAttemptsExceededException", e);
-        return ErrorResponse.builder().message(e.getMessage()).build();
-    }
-
-    @ExceptionHandler(AccessDeniedException.class)
-    @ResponseStatus(HttpStatus.FORBIDDEN)
-    @ResponseBody
-    public ErrorResponse accessDeniedExceptionHandler(AccessDeniedException e) {
-        log.warn("accessDeniedExceptionHandler", e);
         return ErrorResponse.builder().message(e.getMessage()).build();
     }
 
@@ -91,6 +80,21 @@ public class GeneralControllerAdvice {
     @ResponseBody
     public ErrorResponse preconditionFailedExceptionHandler(PreconditionFailedException e){
         log.warn("PreconditionFailedException", e);
+        return ErrorResponse.builder().message(e.getMessage()).build();
+    }
+
+    @ExceptionHandler(ConflictException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ResponseBody
+    public ErrorResponse conflictExceptionHandler(ConflictException e){
+        log.warn("ConflictException", e);
+        return ErrorResponse.builder().message(e.getMessage()).build();
+    }
+    @ExceptionHandler(NotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseBody
+    public ErrorResponse notFoundExceptionHandler(NotFoundException e){
+        log.warn("NotFoundException", e);
         return ErrorResponse.builder().message(e.getMessage()).build();
     }
 

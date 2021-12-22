@@ -34,13 +34,13 @@ public class Swagger2Config {
     }
 
     protected ApiInfo apiEndPointsInfo() {
-        return new ApiInfoBuilder().title("connect REST APIs")
-            .description("click on upper link for getting swagger file")
-            .contact(new Contact("vasl", "www.vasl.ir", "support@vasl.ir"))
-            .license("Apache 2.0")
-            .licenseUrl("http://www.vasl.ir")
-            .version("1.0.0")
-            .build();
+        return new ApiInfoBuilder().title("core bank REST APIs")
+                .description("click on upper link for getting swagger file")
+                .contact(new Contact("egs", "www.egs.com", "support@egs.com"))
+                .license("Apache 2.0")
+                .licenseUrl("http://www.egs.com")
+                .version("1.0.0")
+                .build();
 
     }
 

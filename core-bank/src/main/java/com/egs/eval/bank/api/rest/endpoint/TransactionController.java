@@ -20,6 +20,7 @@ public class TransactionController {
 
     private final TransactionFacade facade;
     private final HttpServletRequest request;
+
     @PostMapping("/withdraw")
     public TransactionResponse doWithdraw(@RequestBody TransactionRequest transactionRequest){
         return facade.withdraw(transactionRequest, request.getHeader("Authorization"));
@@ -30,13 +31,19 @@ public class TransactionController {
         return facade.deposit(transactionRequest, request.getHeader("Authorization"));
     }
 
+    @PostMapping("/rollback/{transactionId}")
+    public TransactionResponse doRollback(@PathVariable("transactionId") String transactionId){
+        return facade.rollback(transactionId);
+    }
+
     @GetMapping("/withdraw/predefines")
     public List<PredefinedValueResponse> getPredefinedValues(){
         return facade.getPredefinedValueList();
     }
 
     @GetMapping("/balance")
-    public BalanceResponse getBalance(){
+    public BalanceResponse getBalance() throws InterruptedException {
+        Thread.sleep(16000L);
         return facade.getBalance(request.getHeader("Authorization"));
     }
 }

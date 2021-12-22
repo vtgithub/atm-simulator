@@ -11,5 +11,7 @@ public interface TransactionService {
 
     TransactionResult deposit(Integer value, String userId);
 
+    TransactionResult rollback(String transactionId);
+
     long getUserBalance(String userId);
 }

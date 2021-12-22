@@ -54,10 +54,11 @@ public class JwtFilter extends OncePerRequestFilter {
     private void returnProperUnAuthorizedResponse(HttpServletResponse httpServletResponse, String message) {
         try {
             httpServletResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
-            httpServletResponse.getWriter().write(
+            httpServletResponse.setContentType("application/json");
+            httpServletResponse.setCharacterEncoding("UTF-8");
+            httpServletResponse.getWriter().print(
                     new ObjectMapper().writer().writeValueAsString(ErrorResponse.builder().message(message).build())
             );
-            httpServletResponse.setHeader("Accept","application/json");
             httpServletResponse.getWriter().flush();
         } catch (IOException e) {
             log.error("writing error", e);

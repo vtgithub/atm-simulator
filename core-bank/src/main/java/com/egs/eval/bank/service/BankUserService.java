@@ -5,28 +5,28 @@ import com.egs.eval.bank.dal.entity.User;
 import com.egs.eval.bank.dal.repository.UserRepository;
 import com.egs.eval.bank.service.mapper.UserServiceMapper;
 import com.egs.eval.bank.service.model.UserQueryModel;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Example;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Supplier;
+import java.util.Set;
 
 @Service
+@RequiredArgsConstructor
 public class BankUserService implements UserService {
 
     private final UserRepository repository;
     private final UserServiceMapper mapper;
-
-    public BankUserService(UserRepository repository, UserServiceMapper mapper) {
-        this.repository = repository;
-        this.mapper = mapper;
-    }
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public Optional<String> getUserId(UserQueryModel queryModel) {
-        User userAsExample = mapper.getUserFromUserQueryModel(queryModel);
-        return repository.findOne(Example.of(userAsExample)).map(Entity::getId);
+        return repository.findByCardSet(Set.of(queryModel.getCard()))
+                .filter(user -> credentialMatches(queryModel, user))
+                .map(Entity::getId);
     }
 
     @Override
@@ -48,5 +48,10 @@ public class BankUserService implements UserService {
 
     private Integer increaseAttempts(Integer todayFailedLoginAttempts) {
         return Objects.isNull(todayFailedLoginAttempts) ? 0 : todayFailedLoginAttempts + 1;
+    }
+
+    private boolean credentialMatches(UserQueryModel queryModel, User user) {
+        return (Objects.nonNull(queryModel.getPin()) && passwordEncoder.matches(queryModel.getPin(), user.getPin()) ) ||
+                (Objects.nonNull(queryModel.getFingerprint()) && passwordEncoder.matches(queryModel.getFingerprint(), user.getFingerprint()));
     }
 }

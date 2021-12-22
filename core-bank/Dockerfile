@@ -1,7 +1,7 @@
-FROM registry.vaslapp.com/docker/openjdk:11-jre
-COPY ./src/main/resources/application-prod.properties /app/application.properties
+#FROM maven:3.8.1-openjdk-17
+FROM registry.vaslapp.com/docker/maven:3.8.1-openjdk-17
+COPY ./src/main/resources/application.properties /app/application.properties
 WORKDIR /app
-RUN echo -n '192.168.159.12 sdms.moi.ir sdmg.moi.ir apima.moi.ir apimo.moi.ir apimg.moi.ir sdma.moi.ir' >> /etc/hosts
-COPY ./target/guilds-*.jar /app/guilds.jar
-EXPOSE 6075
-CMD ["java", "-jar", "guilds.jar", "--spring.config.location=application.properties"]
+COPY ./target/core-bank-*.jar /app/core-bank.jar
+EXPOSE 4030
+CMD ["java", "-jar", "core-bank.jar", "--spring.config.location=application.properties"]

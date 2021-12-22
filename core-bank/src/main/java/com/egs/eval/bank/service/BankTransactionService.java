@@ -5,6 +5,7 @@ import com.egs.eval.bank.dal.repository.TransactionRepository;
 import com.egs.eval.bank.service.mapper.TransactionMapper;
 import com.egs.eval.bank.service.model.TransactionResult;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,7 +30,7 @@ public class BankTransactionService implements TransactionService {
         long balance = getBalanceByCheckingWithdrawCondition(userId, value);
         Transaction transaction = mapper.getTransaction(userId, value * -1, UUID.randomUUID().toString());
         repository.save(transaction);
-        return mapper.getTransactionResult(transaction.getTransactionId(), balance - value);
+        return mapper.getTransactionResult(transaction, balance - value);
     }
 
     @Override
@@ -37,13 +38,22 @@ public class BankTransactionService implements TransactionService {
         long balance = getUserBalanceByNullConsideration(userId);
         Transaction transaction = mapper.getTransaction(userId, value, UUID.randomUUID().toString());
         repository.save(transaction);
-        return mapper.getTransactionResult(transaction.getTransactionId(), balance + value);
+        return mapper.getTransactionResult(transaction, balance + value);
+    }
+
+    @Override
+    public TransactionResult rollback(String transactionId) {
+        return repository.findByTransactionId(transactionId)
+                .map(this::doRollbackTransaction)
+                .orElseThrow(() -> {throw new NotFoundException("transactionId not found.");});
     }
 
     @Override
     public long getUserBalance(String userId) {
         return getUserBalanceByNullConsideration(userId);
     }
+
+    // -----------------------------------------------------------------------------------------------------------------
 
     private long getBalanceByCheckingWithdrawCondition(String userId, Integer value) {
         long balance = getUserBalanceByNullConsideration(userId);
@@ -55,5 +65,20 @@ public class BankTransactionService implements TransactionService {
     private long getUserBalanceByNullConsideration(String userId) {
         Long result = repository.sumValues(userId);
         return Objects.isNull(result) ? 0 : result;
+    }
+
+    private TransactionResult doRollbackTransaction(Transaction transaction) {
+        checkForRolledBackBefore(transaction.getTransactionId());
+        long balance = getUserBalanceByNullConsideration(transaction.getUserId());
+        Transaction rollbackTransaction = mapper.getRollbackTransactionFromTransaction(
+                transaction, UUID.randomUUID().toString());
+        rollbackTransaction = repository.save(rollbackTransaction);
+        return mapper.getTransactionResult(rollbackTransaction, balance + rollbackTransaction.getValue());
+    }
+
+    private void checkForRolledBackBefore(String transactionId) {
+        repository.findByRolledBackFor(transactionId).ifPresent(transaction -> {
+            throw new ConflictException("this transaction rolledBack once before!");
+        });
     }
 }
